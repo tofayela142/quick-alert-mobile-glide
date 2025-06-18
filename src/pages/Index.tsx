@@ -3,28 +3,30 @@ import React, { useState, useEffect } from 'react';
 import AppHeader from '../components/AppHeader';
 import ImageSlider from '../components/ImageSlider';
 import SensorCard from '../components/SensorCard';
-import { Activity, Droplets, Thermometer, Wind, Beaker, Waves } from 'lucide-react';
+import NotificationPanel from '../components/NotificationPanel';
+import DeveloperDetails from '../components/DeveloperDetails';
+import { Activity, Wind, Thermometer, Eye, Bell, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [sensorData, setSensorData] = useState({
-    ph: 8.20,
-    tds: 668.00,
-    temperature: 32.00,
-    do: 2.00,
-    nh3: 1.67,
-    salinity: 24.5
+    ph: 7.2,
+    do: 6.5,
+    turbidity: 25.0,
+    temperature: 28.5
   });
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showDeveloper, setShowDeveloper] = useState(false);
 
   // Simulate real-time data updates
   useEffect(() => {
     const interval = setInterval(() => {
       setSensorData(prev => ({
-        ph: +(prev.ph + (Math.random() - 0.5) * 0.1).toFixed(2),
-        tds: +(prev.tds + (Math.random() - 0.5) * 10).toFixed(2),
-        temperature: +(prev.temperature + (Math.random() - 0.5) * 2).toFixed(2),
-        do: +(prev.do + (Math.random() - 0.5) * 0.3).toFixed(2),
-        nh3: +(prev.nh3 + (Math.random() - 0.5) * 0.1).toFixed(2),
-        salinity: +(prev.salinity + (Math.random() - 0.5) * 1).toFixed(1)
+        ph: +(prev.ph + (Math.random() - 0.5) * 0.2).toFixed(1),
+        do: +(prev.do + (Math.random() - 0.5) * 0.3).toFixed(1),
+        turbidity: +(prev.turbidity + (Math.random() - 0.5) * 2).toFixed(1),
+        temperature: +(prev.temperature + (Math.random() - 0.5) * 1).toFixed(1)
       }));
     }, 5000);
 
@@ -42,49 +44,31 @@ const Index = () => {
       delay: 0
     },
     {
-      icon: Waves,
-      label: 'TDS',
-      value: sensorData.tds.toString(),
+      icon: Wind,
+      label: 'Dissolved O2',
+      value: sensorData.do.toString(),
       unit: 'mg/L',
-      color: 'text-red-600',
-      bgColor: 'bg-red-100',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
       delay: 100
     },
     {
+      icon: Eye,
+      label: 'Turbidity',
+      value: sensorData.turbidity.toString(),
+      unit: 'NTU',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
+      delay: 200
+    },
+    {
       icon: Thermometer,
-      label: 'Temperature',
+      label: 'Water Temp',
       value: sensorData.temperature.toString(),
       unit: '°C',
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
-      delay: 200
-    },
-    {
-      icon: Wind,
-      label: 'Dissolved O2',
-      value: sensorData.do.toString(),
-      unit: 'ppm',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
       delay: 300
-    },
-    {
-      icon: Beaker,
-      label: 'Ammonia (NH3)',
-      value: sensorData.nh3.toString(),
-      unit: 'mg/L',
-      color: 'text-teal-600',
-      bgColor: 'bg-teal-100',
-      delay: 400
-    },
-    {
-      icon: Droplets,
-      label: 'Salinity',
-      value: sensorData.salinity.toString(),
-      unit: 'ppt',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
-      delay: 500
     }
   ];
 
@@ -119,23 +103,33 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">System Status</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Sensor Connection</span>
-              <span className="text-green-600 font-medium">Online</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Data Sync</span>
-              <span className="text-blue-600 font-medium">Active</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Last Update</span>
-              <span className="text-gray-600 font-medium">Just now</span>
-            </div>
-          </div>
+        <div className="flex gap-3 mb-6">
+          <Button 
+            onClick={() => setShowNotifications(true)}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+          >
+            <Bell className="w-4 h-4 mr-2" />
+            Notifications
+          </Button>
+          <Button 
+            onClick={() => setShowDeveloper(true)}
+            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+          >
+            <User className="w-4 h-4 mr-2" />
+            Developer
+          </Button>
         </div>
+
+        <NotificationPanel 
+          isOpen={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          sensorData={sensorData}
+        />
+
+        <DeveloperDetails 
+          isOpen={showDeveloper}
+          onClose={() => setShowDeveloper(false)}
+        />
       </div>
     </div>
   );
