@@ -201,20 +201,26 @@ const Index = () => {
         </div>
 
         <div className="flex gap-3 mb-6">
-          <Button 
+          <button 
             onClick={() => setShowNotifications(true)}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+            className="flex-1 relative bg-gradient-to-b from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 active:scale-95 border-b-4 border-red-800 hover:border-red-900"
           >
-            <Bell className="w-4 h-4 mr-2" />
-            Notifications
-          </Button>
-          <Button 
+            <div className="flex items-center justify-center">
+              <Bell className="w-4 h-4 mr-2" />
+              Notifications
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white opacity-20 rounded-xl pointer-events-none"></div>
+          </button>
+          <button 
             onClick={() => setShowDeveloper(true)}
-            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+            className="flex-1 relative bg-gradient-to-b from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 active:scale-95 border-b-4 border-gray-900 hover:border-black"
           >
-            <User className="w-4 h-4 mr-2" />
-            Developer
-          </Button>
+            <div className="flex items-center justify-center">
+              <User className="w-4 h-4 mr-2" />
+              Developer
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white opacity-20 rounded-xl pointer-events-none"></div>
+          </button>
         </div>
 
         <NotificationPanel 
