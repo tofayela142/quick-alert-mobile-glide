@@ -30,11 +30,11 @@ const AppHeader = () => {
     <div className="bg-gradient-to-r from-blue-600 to-teal-600 text-white p-4 rounded-xl mb-6 shadow-lg">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-3">
-        <div className="flex items-center justify-center w-12">
+        <div className="flex items-center justify-center w-16">
             <img
               src="https://seeklogo.com/images/N/noakhali-science-and-technology-university-logo-6626023A42-seeklogo.com.png"
               alt="NSTU Logo"
-              className="w-12"
+              className="w-16"
             />
         </div>
           <div>
