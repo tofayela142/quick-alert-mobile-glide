@@ -11,6 +11,8 @@ interface NotificationPanelProps {
     do: number;
     turbidity: number;
     temperature: number;
+    tds: number;
+    nh3: number;
   };
 }
 
@@ -84,6 +86,36 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, onClose, 
         title: 'High Water Temperature',
         message: 'Temperature is high. Increase aeration and consider shading.',
         icon: AlertTriangle,
+        color: 'text-red-600'
+      });
+    }
+
+    // TDS notifications (ideal range: 100-300 ppm)
+    if (sensorData.tds < 100) {
+      notifications.push({
+        type: 'info',
+        title: 'Low TDS Level',
+        message: 'Total dissolved solids are low. Monitor water quality.',
+        icon: AlertCircle,
+        color: 'text-blue-600'
+      });
+    } else if (sensorData.tds > 300) {
+      notifications.push({
+        type: 'warning',
+        title: 'High TDS Level',
+        message: 'TDS levels are high. Consider water exchange or filtration.',
+        icon: AlertTriangle,
+        color: 'text-yellow-600'
+      });
+    }
+
+    // NH3 notifications (ideal range: 0-0.02 mg/L)
+    if (sensorData.nh3 > 0.02) {
+      notifications.push({
+        type: 'critical',
+        title: 'High Ammonia Level',
+        message: 'Critical! Ammonia levels are toxic. Immediate water change needed!',
+        icon: AlertCircle,
         color: 'text-red-600'
       });
     }

@@ -5,39 +5,118 @@ import ImageSlider from '../components/ImageSlider';
 import SensorCard from '../components/SensorCard';
 import NotificationPanel from '../components/NotificationPanel';
 import DeveloperDetails from '../components/DeveloperDetails';
-import { Activity, Wind, Thermometer, Eye, Bell, User } from 'lucide-react';
+import { Activity, Wind, Thermometer, Eye, Bell, User, Droplets, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue } from 'firebase/database';
+
+// Firebase configuration
+const firebaseConfig = {
+  databaseURL: "https://sensormonitor-3c8db-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 const Index = () => {
   const [sensorData, setSensorData] = useState({
     ph: 7.2,
     do: 6.5,
     turbidity: 25.0,
-    temperature: 28.5
+    temperature: 28.5,
+    tds: 150.0,
+    nh3: 0.02
   });
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showDeveloper, setShowDeveloper] = useState(false);
 
-  // Simulate real-time data updates
+  // Fetch real-time data from Firebase
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSensorData(prev => ({
-        ph: +(prev.ph + (Math.random() - 0.5) * 0.2).toFixed(1),
-        do: +(prev.do + (Math.random() - 0.5) * 0.3).toFixed(1),
-        turbidity: +(prev.turbidity + (Math.random() - 0.5) * 2).toFixed(1),
-        temperature: +(prev.temperature + (Math.random() - 0.5) * 1).toFixed(1)
-      }));
-    }, 5000);
+    console.log('Setting up Firebase listeners...');
+    
+    const phRef = ref(database, 'sensors/ph');
+    const doRef = ref(database, 'sensors/do');
+    const turbidityRef = ref(database, 'sensors/turbidity');
+    const temperatureRef = ref(database, 'sensors/temperature');
+    const tdsRef = ref(database, 'sensors/tds');
+    const nh3Ref = ref(database, 'sensors/nh3');
 
-    return () => clearInterval(interval);
+    const unsubscribes = [];
+
+    // Listen to pH changes
+    const phUnsubscribe = onValue(phRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('pH data received:', value);
+        setSensorData(prev => ({ ...prev, ph: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(phUnsubscribe);
+
+    // Listen to DO changes
+    const doUnsubscribe = onValue(doRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('DO data received:', value);
+        setSensorData(prev => ({ ...prev, do: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(doUnsubscribe);
+
+    // Listen to turbidity changes
+    const turbidityUnsubscribe = onValue(turbidityRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('Turbidity data received:', value);
+        setSensorData(prev => ({ ...prev, turbidity: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(turbidityUnsubscribe);
+
+    // Listen to temperature changes
+    const temperatureUnsubscribe = onValue(temperatureRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('Temperature data received:', value);
+        setSensorData(prev => ({ ...prev, temperature: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(temperatureUnsubscribe);
+
+    // Listen to TDS changes
+    const tdsUnsubscribe = onValue(tdsRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('TDS data received:', value);
+        setSensorData(prev => ({ ...prev, tds: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(tdsUnsubscribe);
+
+    // Listen to NH3 changes
+    const nh3Unsubscribe = onValue(nh3Ref, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        console.log('NH3 data received:', value);
+        setSensorData(prev => ({ ...prev, nh3: parseFloat(value) }));
+      }
+    });
+    unsubscribes.push(nh3Unsubscribe);
+
+    // Cleanup function
+    return () => {
+      console.log('Cleaning up Firebase listeners...');
+      unsubscribes.forEach(unsubscribe => unsubscribe());
+    };
   }, []);
 
   const sensorCards = [
     {
       icon: Activity,
       label: 'pH Level',
-      value: sensorData.ph.toString(),
+      value: sensorData.ph.toFixed(1),
       unit: 'pH',
       color: 'text-green-600',
       bgColor: 'bg-green-100',
@@ -46,7 +125,7 @@ const Index = () => {
     {
       icon: Wind,
       label: 'Dissolved O2',
-      value: sensorData.do.toString(),
+      value: sensorData.do.toFixed(1),
       unit: 'mg/L',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
@@ -55,7 +134,7 @@ const Index = () => {
     {
       icon: Eye,
       label: 'Turbidity',
-      value: sensorData.turbidity.toString(),
+      value: sensorData.turbidity.toFixed(1),
       unit: 'NTU',
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
@@ -64,11 +143,29 @@ const Index = () => {
     {
       icon: Thermometer,
       label: 'Water Temp',
-      value: sensorData.temperature.toString(),
+      value: sensorData.temperature.toFixed(1),
       unit: '°C',
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
       delay: 300
+    },
+    {
+      icon: Droplets,
+      label: 'TDS',
+      value: sensorData.tds.toFixed(0),
+      unit: 'ppm',
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-100',
+      delay: 400
+    },
+    {
+      icon: Zap,
+      label: 'NH3',
+      value: sensorData.nh3.toFixed(3),
+      unit: 'mg/L',
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100',
+      delay: 500
     }
   ];
 
