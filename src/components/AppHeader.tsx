@@ -6,7 +6,7 @@ const AppHeader = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [airTemp] = useState(26); // This would come from weather API
   const [humidity] = useState(78); // This would come from weather API
-  const [location] = useState('Dhaka, Bangladesh'); // This would come from geolocation API
+  const [location] = useState('Noakhali, Chittagong, Bangladesh'); // Updated location
 
   useEffect(() => {
     const updateTime = () => {
@@ -35,7 +35,7 @@ const AppHeader = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold">Smart Fish Farm Monitoring</h1>
-            <p className="text-blue-100 text-sm">Water Quality System</p>
+            <p className="text-blue-100 text-sm">CSTE Department - NSTU</p>
           </div>
         </div>
         <div className="text-right">
