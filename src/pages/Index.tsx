@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppHeader from '../components/AppHeader';
 import ImageSlider from '../components/ImageSlider';
@@ -8,7 +7,7 @@ import DeveloperDetails from '../components/DeveloperDetails';
 import { Activity, Wind, Thermometer, Eye, Bell, User, Droplets, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue } from 'firebase/database';
+import { getDatabase, ref, onValue, query, orderByKey, limitToLast } from 'firebase/database';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -34,81 +33,42 @@ const Index = () => {
 
   // Fetch real-time data from Firebase
   useEffect(() => {
-    console.log('Setting up Firebase listeners...');
+    console.log('Setting up Firebase listener for sensorData...');
     
-    const phRef = ref(database, 'sensors/ph');
-    const doRef = ref(database, 'sensors/do');
-    const turbidityRef = ref(database, 'sensors/turbidity');
-    const temperatureRef = ref(database, 'sensors/temperature');
-    const tdsRef = ref(database, 'sensors/tds');
-    const nh3Ref = ref(database, 'sensors/nh3');
+    // Listen to the sensorData collection and get the latest entry
+    const sensorDataRef = ref(database, 'sensorData');
+    const latestDataQuery = query(sensorDataRef, orderByKey(), limitToLast(1));
 
-    const unsubscribes = [];
-
-    // Listen to pH changes
-    const phUnsubscribe = onValue(phRef, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('pH data received:', value);
-        setSensorData(prev => ({ ...prev, ph: parseFloat(value) }));
+    const unsubscribe = onValue(latestDataQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        console.log('Raw Firebase data received:', data);
+        
+        // Get the latest entry (there should be only one due to limitToLast(1))
+        const latestEntry = Object.values(data)[0] as any;
+        console.log('Latest sensor data:', latestEntry);
+        
+        if (latestEntry) {
+          setSensorData(prev => ({
+            ...prev,
+            ph: latestEntry.ph || prev.ph,
+            do: latestEntry.do || prev.do,
+            turbidity: latestEntry.turbidity || prev.turbidity,
+            temperature: latestEntry.temp || prev.temperature, // Note: Python uses 'temp', React uses 'temperature'
+            // TDS and NH3 will be added when available in your Python script
+            tds: latestEntry.tds || prev.tds,
+            nh3: latestEntry.nh3 || prev.nh3
+          }));
+        }
       }
+    }, (error) => {
+      console.error('Firebase read error:', error);
     });
-    unsubscribes.push(phUnsubscribe);
-
-    // Listen to DO changes
-    const doUnsubscribe = onValue(doRef, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('DO data received:', value);
-        setSensorData(prev => ({ ...prev, do: parseFloat(value) }));
-      }
-    });
-    unsubscribes.push(doUnsubscribe);
-
-    // Listen to turbidity changes
-    const turbidityUnsubscribe = onValue(turbidityRef, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('Turbidity data received:', value);
-        setSensorData(prev => ({ ...prev, turbidity: parseFloat(value) }));
-      }
-    });
-    unsubscribes.push(turbidityUnsubscribe);
-
-    // Listen to temperature changes
-    const temperatureUnsubscribe = onValue(temperatureRef, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('Temperature data received:', value);
-        setSensorData(prev => ({ ...prev, temperature: parseFloat(value) }));
-      }
-    });
-    unsubscribes.push(temperatureUnsubscribe);
-
-    // Listen to TDS changes
-    const tdsUnsubscribe = onValue(tdsRef, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('TDS data received:', value);
-        setSensorData(prev => ({ ...prev, tds: parseFloat(value) }));
-      }
-    });
-    unsubscribes.push(tdsUnsubscribe);
-
-    // Listen to NH3 changes
-    const nh3Unsubscribe = onValue(nh3Ref, (snapshot) => {
-      const value = snapshot.val();
-      if (value !== null) {
-        console.log('NH3 data received:', value);
-        setSensorData(prev => ({ ...prev, nh3: parseFloat(value) }));
-      }
-    });
-    unsubscribes.push(nh3Unsubscribe);
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up Firebase listeners...');
-      unsubscribes.forEach(unsubscribe => unsubscribe());
+      console.log('Cleaning up Firebase listener...');
+      unsubscribe();
     };
   }, []);
 
