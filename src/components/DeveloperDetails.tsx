@@ -50,12 +50,12 @@ const DeveloperDetails: React.FC<DeveloperDetailsProps> = ({ isOpen, onClose }) 
 
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <Github className="w-4 h-4 text-gray-800" />
-            <span className="text-sm text-gray-700">github.com/sheikhtorikul</span>
+            <span className="text-sm text-gray-700">github.com/tofayela142</span>
           </div>
 
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <Linkedin className="w-4 h-4 text-blue-800" />
-            <span className="text-sm text-gray-700">linkedin.com/in/sheikhtorikul</span>
+            <span className="text-sm text-gray-700">linkedin.com/in/sheikh-torikul-islam-86087523b</span>
           </div>
         </div>
 
