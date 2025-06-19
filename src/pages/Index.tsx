@@ -132,6 +132,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-cyan-50">
       <div className="max-w-md mx-auto px-4 py-6">
+
+        <div className="text-center w-full mb-2 w-20">
+          <img src="https://seeklogo.com/images/N/noakhali-science-and-technology-university-logo-6626023A42-seeklogo.com.png" alt="NSTU logo" class="w-" />
+        </div>
+        
         <AppHeader />
         <ImageSlider />
         
