@@ -132,6 +132,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-cyan-50">
       <div className="max-w-md mx-auto px-4 py-6">
+        
         <AppHeader />
         <ImageSlider />
         
